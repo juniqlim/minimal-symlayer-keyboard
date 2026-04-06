@@ -83,6 +83,14 @@ fun makeKeyEvent(original: KeyEvent, code: Int, metaState: Int, action: Int, sou
 	return KeyEvent(original.downTime, original.eventTime, action, code, original.repeatCount, metaState, deviceId, code, 0, source)
 }
 
+fun shouldApplyMultipress(koreanInputActive: Boolean, isPrintingKey: Boolean, keyCode: Int): Boolean {
+	return if (koreanInputActive) {
+		keyCode == KeyEvent.KEYCODE_SPACE
+	} else {
+		isPrintingKey || keyCode == KeyEvent.KEYCODE_SPACE
+	}
+}
+
 val templates = hashMapOf(
 	"fr" to hashMapOf(
 		KeyEvent.KEYCODE_A to arrayOf('`', '^', 'æ', MPSUBST_BYPASS),
@@ -495,8 +503,8 @@ class InputMethodService : AndroidInputMethodService() {
 			}
 		}
 
-		// Apply multipress substitution (disabled in Korean input mode)
-		if(!koreanInput.isActive() && (event.isPrintingKey || event.keyCode == KeyEvent.KEYCODE_SPACE)) {
+		// In Korean mode, keep double-space period while blocking letter multipress substitutions.
+		if(shouldApplyMultipress(koreanInput.isActive(), event.isPrintingKey, event.keyCode)) {
 			val char = multipress.process(event, enhancedMetaState(event))
 			if(char != MPSUBST_BYPASS) {
 				if(char != MPSUBST_NOTHING) {
