@@ -91,6 +91,10 @@ fun shouldApplyMultipress(koreanInputActive: Boolean, isPrintingKey: Boolean, ke
 	}
 }
 
+fun shouldResetMultipressState(koreanInputActive: Boolean, isPrintingKey: Boolean, keyCode: Int): Boolean {
+	return koreanInputActive && isPrintingKey && keyCode != KeyEvent.KEYCODE_SPACE
+}
+
 val templates = hashMapOf(
 	"fr" to hashMapOf(
 		KeyEvent.KEYCODE_A to arrayOf('`', '^', 'æ', MPSUBST_BYPASS),
@@ -520,6 +524,9 @@ class InputMethodService : AndroidInputMethodService() {
 				}
 				return true
 			}
+		}
+		if (shouldResetMultipressState(koreanInput.isActive(), event.isPrintingKey, event.keyCode)) {
+			multipress.reset()
 		}
 
 		// Handle backspace/delete

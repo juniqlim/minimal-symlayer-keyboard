@@ -38,4 +38,26 @@ class InputMethodServiceMultipressPolicyTest {
 			)
 		)
 	}
+
+	@Test
+	fun resetsPendingDoubleSpaceWhenKoreanLetterInputIsSkippedFromMultipress() {
+		assertTrue(
+			shouldResetMultipressState(
+				koreanInputActive = true,
+				isPrintingKey = true,
+				keyCode = KeyEvent.KEYCODE_S
+			)
+		)
+	}
+
+	@Test
+	fun doesNotResetPendingDoubleSpaceForSpaceKeyInKoreanMode() {
+		assertFalse(
+			shouldResetMultipressState(
+				koreanInputActive = true,
+				isPrintingKey = false,
+				keyCode = KeyEvent.KEYCODE_SPACE
+			)
+		)
+	}
 }
